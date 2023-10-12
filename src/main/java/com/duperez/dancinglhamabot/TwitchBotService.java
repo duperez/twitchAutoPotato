@@ -59,29 +59,45 @@ public class TwitchBotService {
 
             ) {
                 if (event.getMessage().contains("potato")) {
-                    timer.schedule(potato(twitchClient, event), 10000);
-                    //twitchClient.getChat().sendMessage(event.getChannel().getName(), "#potato");
+                    //timer.schedule(potato(twitchClient, event), 5000);
+                    timer.schedule(task(twitchClient, event, "potato"), 5000);
                 }
                 if (event.getMessage().contains("steal")) {
-                    timer.schedule(steal(twitchClient, event), 10000);
-                    //twitchClient.getChat().sendMessage(event.getChannel().getName(), "#steal");
+                    //timer.schedule(steal(twitchClient, event), 10000);
+                    timer.schedule(task(twitchClient, event, "steal"), 10000);
                 }
                 if (event.getMessage().contains("trample")) {
-                    timer.schedule(trample(twitchClient, event), 10000);
-                    //twitchClient.getChat().sendMessage(event.getChannel().getName(), "#trample");
+                    //timer.schedule(trample(twitchClient, event), 15000);
+                    timer.schedule(task(twitchClient, event, "trample"), 15000);
                 }
                 if (event.getMessage().contains("cdr")) {
-                    timer.schedule(trample(twitchClient, event), 10000);
+                    timer.schedule(task(twitchClient, event, "cdr"), 5000);
+                    timer.schedule(task(twitchClient, event, "trample"), 10000);
+                    timer.schedule(task(twitchClient, event, "steal"), 15000);
+                    timer.schedule(task(twitchClient, event, "trample"), 20000);
+                    //timer.schedule(cdr(twitchClient, event), 5000);
+                   //timer.schedule(trample(twitchClient, event), 10000);
                     //twitchClient.getChat().sendMessage(event.getChannel().getName(), "#potato");
-                    timer.schedule(steal(twitchClient, event), 15000);
+                    //timer.schedule(steal(twitchClient, event), 15000);
                     //twitchClient.getChat().sendMessage(event.getChannel().getName(), "#steal");
-                    timer.schedule(trample(twitchClient, event), 20000);
+                    //timer.schedule(trample(twitchClient, event), 20000);
                     //twitchClient.getChat().sendMessage(event.getChannel().getName(), "#trample");
                 }
             }
         });
     }
 
+    @NotNull
+    private TimerTask cdr(TwitchClient twitchClient, ChannelMessageActionEvent event) {
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                twitchClient.getChat().sendMessage(event.getChannel().getName(), "#cdr");
+                System.out.println("potato executed!");
+            }
+        };
+        return task;
+    }
     @NotNull
     private TimerTask potato(TwitchClient twitchClient, ChannelMessageActionEvent event) {
         TimerTask task = new TimerTask() {
@@ -113,6 +129,18 @@ public class TwitchBotService {
             public void run() {
                 twitchClient.getChat().sendMessage(event.getChannel().getName(), "#trample");
                 System.out.println("trample executed!");
+            }
+        };
+        return task;
+    }
+
+    @NotNull
+    private TimerTask task(TwitchClient twitchClient, ChannelMessageActionEvent event, String command) {
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                twitchClient.getChat().sendMessage(event.getChannel().getName(), "#" + command);
+                System.out.println(command + " executed!");
             }
         };
         return task;
