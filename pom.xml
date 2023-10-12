@@ -65,6 +65,13 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <release>17</release> <!-- Considere ajustar ou remover esta linha -->
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
