@@ -49,7 +49,7 @@ public class TwitchBotServiceExecutor {
         twitchClient.getEventManager().onEvent(ChannelMessageActionEvent.class, event -> {
             System.out.println(event.getMessage());
             if (
-                            //event.getMessage().contains(user) &&
+                            event.getMessage().contains(user) &&
                             event.getMessage().contains("you have")
 
             ) {
