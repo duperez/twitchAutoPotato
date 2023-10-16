@@ -6,11 +6,15 @@ import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.chat.events.channel.ChannelMessageActionEvent;
 import jakarta.annotation.PostConstruct;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class TwitchBotService {
@@ -30,109 +34,115 @@ public class TwitchBotService {
     @Value("${USER_NAME}")
     private String user;
 
+    static int totalPotato = 0;
+
+    @Autowired
+    private UserRepository twitchUserRepository;
+
 
 
 
     @PostConstruct
     public void startBot() {
 
-        Timer timer = new Timer();
+        //Timer timer = new Timer();
+//
+        //TwitchClient twitchClient = TwitchClientBuilder.builder()
+        //        .withClientId(clientId)
+        //        .withClientSecret(clientSecret)
+        //        .withChatAccount(new OAuth2Credential("twitch", oauth))
+        //        .withEnableChat(true)
+        //        .build();
+//
+        //twitchClient.getChat().joinChannel(channels);
+//
+        //twitchClient.getEventManager().onEvent(com.github.twitch4j.chat.events.channel.ChannelMessageActionEvent.class, event -> {
+        //    System.out.println(event.getMessage());
+        //    if (
+        //                    event.getMessage().contains(user) &&
+        //                    event.getMessage().contains("you have")
+//
+        //    ) {
+        //        sendPotatoMessage(timer, twitchClient, event);
+        //        if(isResult(event.getMessage())) {
+        //            extractTotalPotato(event.getMessage());
+        //            extractTotalNeededPotato(event.getMessage());
+        //            printNumberOfPotatoes();
+        //        }
+//
+        //    }
+        //});
 
-        TwitchClient twitchClient = TwitchClientBuilder.builder()
-                .withClientId(clientId)
-                .withClientSecret(clientSecret)
-                .withChatAccount(new OAuth2Credential("twitch", oauth))
-                .withEnableChat(true)
-                .build();
+        ExecutionSingleton executionSingleton = ExecutionSingleton.getInstance();
 
-        twitchClient.getChat().joinChannel(channels);
+        executionSingleton.execute(twitchUserRepository.findAll());
 
-        // Ouça as mensagens do chat
-        twitchClient.getEventManager().onEvent(com.github.twitch4j.chat.events.channel.ChannelMessageActionEvent.class, event -> {
-            System.out.println(event.getMessage());
-            // Verifique se a mensagem vem do bot "NomeDoBot"
-            //
-            if (
-                    //event.getUser().getName().equalsIgnoreCase("PotatBotat") &&
-                            event.getMessage().contains(user) &&
-                            event.getMessage().contains("you have")
-
-            ) {
-                if (event.getMessage().contains("potato")) {
-                    //timer.schedule(potato(twitchClient, event), 5000);
-                    timer.schedule(task(twitchClient, event, "potato"), 5000);
-                }
-                if (event.getMessage().contains("steal")) {
-                    //timer.schedule(steal(twitchClient, event), 10000);
-                    timer.schedule(task(twitchClient, event, "steal"), 10000);
-                }
-                if (event.getMessage().contains("trample")) {
-                    //timer.schedule(trample(twitchClient, event), 15000);
-                    timer.schedule(task(twitchClient, event, "trample"), 15000);
-                }
-                if (event.getMessage().contains("cdr")) {
-                    timer.schedule(task(twitchClient, event, "cdr"), 5000);
-                    timer.schedule(task(twitchClient, event, "trample"), 10000);
-                    timer.schedule(task(twitchClient, event, "steal"), 15000);
-                    timer.schedule(task(twitchClient, event, "trample"), 20000);
-                    //timer.schedule(cdr(twitchClient, event), 5000);
-                   //timer.schedule(trample(twitchClient, event), 10000);
-                    //twitchClient.getChat().sendMessage(event.getChannel().getName(), "#potato");
-                    //timer.schedule(steal(twitchClient, event), 15000);
-                    //twitchClient.getChat().sendMessage(event.getChannel().getName(), "#steal");
-                    //timer.schedule(trample(twitchClient, event), 20000);
-                    //twitchClient.getChat().sendMessage(event.getChannel().getName(), "#trample");
-                }
-            }
-        });
     }
 
-    @NotNull
-    private TimerTask cdr(TwitchClient twitchClient, ChannelMessageActionEvent event) {
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                twitchClient.getChat().sendMessage(event.getChannel().getName(), "#cdr");
-                System.out.println("potato executed!");
-            }
-        };
-        return task;
-    }
-    @NotNull
-    private TimerTask potato(TwitchClient twitchClient, ChannelMessageActionEvent event) {
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                twitchClient.getChat().sendMessage(event.getChannel().getName(), "#potato");
-                System.out.println("potato executed!");
-            }
-        };
-        return task;
+    private void sendPotatoMessage(Timer timer, TwitchClient twitchClient, ChannelMessageActionEvent event) {
+        if (event.getMessage().contains("potato")) {
+            timer.schedule(task(twitchClient, event, "potato"), 5000);
+        }
+        if (event.getMessage().contains("steal")) {
+            timer.schedule(task(twitchClient, event, "steal"), 10000);
+        }
+        if (event.getMessage().contains("trample")) {
+            timer.schedule(task(twitchClient, event, "trample"), 15000);
+        }
+        if (event.getMessage().contains("cdr")) {
+            timer.schedule(task(twitchClient, event, "potato"), 5000);
+            timer.schedule(task(twitchClient, event, "trample"), 10000);
+            timer.schedule(task(twitchClient, event, "steal"), 15000);
+            timer.schedule(task(twitchClient, event, "trample"), 20000);
+        }
     }
 
-    @NotNull
-    private TimerTask steal(TwitchClient twitchClient, ChannelMessageActionEvent event) {
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                twitchClient.getChat().sendMessage(event.getChannel().getName(), "#steal");
-                System.out.println("steal executed!");
-            }
-        };
-        return task;
+    public boolean isResult(String texto) {
+        String padrao = "\\[(?:\\+|-)?\\d+ ⇒ (?:-\\d+|\\d+)\\]";
+
+        Pattern pattern = Pattern.compile(padrao);
+
+        Matcher matcher = pattern.matcher(texto);
+
+
+        if(matcher.find()) {
+            return matcher.matches();
+        }
+        return false;
     }
 
-    @NotNull
-    private TimerTask trample(TwitchClient twitchClient, ChannelMessageActionEvent event) {
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                twitchClient.getChat().sendMessage(event.getChannel().getName(), "#trample");
-                System.out.println("trample executed!");
-            }
-        };
-        return task;
+    public static Integer extractTotalPotato(String text) {
+        String padrao = "\\[(?:\\+|-)?\\d+ ⇒ ([-\\d,]+)\\]";
+
+        Pattern pattern = Pattern.compile(padrao);
+
+        Matcher matcher = pattern.matcher(text);
+
+        if(matcher.find()) {
+            totalPotato = Integer.parseInt(matcher.group(1));
+            return Integer.parseInt(matcher.group(1));
+        }
+        return 0;
     }
+
+    public static Integer extractTotalNeededPotato(String text) {
+        String padrao = "\\[(?:\\+|-)?\\d+ ⇒ ([-\\d,]+)\\]";
+
+        Pattern pattern = Pattern.compile(padrao);
+
+        Matcher matcher = pattern.matcher(text);
+
+        if(matcher.find()) {
+            totalPotato = Integer.parseInt(matcher.group(1));
+            return Integer.parseInt(matcher.group(1));
+        }
+        return 0;
+    }
+
+    public static void printNumberOfPotatoes() {
+        System.out.println(totalPotato);
+    }
+
 
     @NotNull
     private TimerTask task(TwitchClient twitchClient, ChannelMessageActionEvent event, String command) {
