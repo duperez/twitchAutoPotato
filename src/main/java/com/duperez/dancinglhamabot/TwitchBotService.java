@@ -19,20 +19,20 @@ import java.util.regex.Pattern;
 @Component
 public class TwitchBotService {
 
-    @Value("${CHANNELS}")
-    private String channels;
-
-    @Value("${ID}")
-    private String clientId;
-
-    @Value("${SECRET}")
-    private String clientSecret;
-
-    @Value("${OAUTH}")
-    private String oauth;
-
-    @Value("${USER_NAME}")
-    private String user;
+    //@Value("${CHANNELS}")
+    //private String channels;
+//
+    //@Value("${ID}")
+    //private String clientId;
+//
+    //@Value("${SECRET}")
+    //private String clientSecret;
+//
+    //@Value("${OAUTH}")
+    //private String oauth;
+//
+    //@Value("${USER_NAME}")
+    //private String user;
 
     static int totalPotato = 0;
 
