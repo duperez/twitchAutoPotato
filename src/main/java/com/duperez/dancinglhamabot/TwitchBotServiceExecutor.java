@@ -75,10 +75,10 @@ public class TwitchBotServiceExecutor {
             timer.schedule(task(twitchClient, event, "trample"), 15000);
         }
         if (event.getMessage().contains("cdr")) {
-            timer.schedule(task(twitchClient, event, "potato"), 5000);
-            timer.schedule(task(twitchClient, event, "trample"), 10000);
-            timer.schedule(task(twitchClient, event, "steal"), 15000);
-            timer.schedule(task(twitchClient, event, "trample"), 20000);
+            timer.schedule(task(twitchClient, event, "cdr"), 5000);
+            timer.schedule(task(twitchClient, event, "potato"), 1000);
+            timer.schedule(task(twitchClient, event, "trample"), 15000);
+            timer.schedule(task(twitchClient, event, "steal"), 20000);
         }
     }
 

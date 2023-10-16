@@ -15,6 +15,10 @@ public class UserService {
         return userRepository.save(twitchUser);
     }
 
+    public void deleteUser(Integer id) {
+        userRepository.deleteById(id);
+    }
+
 
 
 
