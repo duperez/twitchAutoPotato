@@ -1,4 +1,6 @@
-package com.duperez.dancinglhamabot;
+package com.duperez.dancinglhamabot.threadExecutors;
+
+import com.duperez.dancinglhamabot.entities.TwitchUser;
 
 import java.util.ArrayList;
 import java.util.List;

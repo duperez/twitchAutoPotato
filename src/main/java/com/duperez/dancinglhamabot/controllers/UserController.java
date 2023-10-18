@@ -1,6 +1,8 @@
-package com.duperez.dancinglhamabot;
+package com.duperez.dancinglhamabot.controllers;
 
 
+import com.duperez.dancinglhamabot.entities.TwitchUser;
+import com.duperez.dancinglhamabot.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

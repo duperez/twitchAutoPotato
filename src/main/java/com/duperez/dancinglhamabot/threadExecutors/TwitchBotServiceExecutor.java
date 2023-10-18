@@ -1,4 +1,4 @@
-package com.duperez.dancinglhamabot;
+package com.duperez.dancinglhamabot.threadExecutors;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.TwitchClient;

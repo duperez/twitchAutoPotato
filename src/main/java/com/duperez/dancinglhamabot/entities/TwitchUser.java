@@ -1,4 +1,4 @@
-package com.duperez.dancinglhamabot;
+package com.duperez.dancinglhamabot.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

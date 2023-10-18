@@ -1,5 +1,8 @@
-package com.duperez.dancinglhamabot;
+package com.duperez.dancinglhamabot.services;
 
+import com.duperez.dancinglhamabot.entities.TwitchUser;
+import com.duperez.dancinglhamabot.repositories.UserRepository;
+import com.duperez.dancinglhamabot.threadExecutors.ExecutionSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
