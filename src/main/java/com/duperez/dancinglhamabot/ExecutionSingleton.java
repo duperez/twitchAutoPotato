@@ -20,15 +20,9 @@ public class ExecutionSingleton {
         return executionSingleton;
     }
 
-
-
     public void execute(List<TwitchUser> twitchUsers) {
-        if (threadExecutors == null)
-            threadExecutors = new ArrayList<>();
         for(TwitchUser twitchUser : twitchUsers) {
-            ThreadExecutors threadExecutorsInstance = new ThreadExecutors();
-            threadExecutorsInstance.run(new TwitchBotServiceExecutor(twitchUser.getChannels(), twitchUser.getClientId(), twitchUser.getClientSecret(), twitchUser.getOauth(), twitchUser.getUser_name()));
-            threadExecutors.add(threadExecutorsInstance);
+            execute(twitchUser);
         }
     }
 
@@ -39,8 +33,6 @@ public class ExecutionSingleton {
         threadExecutorsInstance.run(new TwitchBotServiceExecutor(twitchUser.getChannels(), twitchUser.getClientId(), twitchUser.getClientSecret(), twitchUser.getOauth(), twitchUser.getUser_name()));
         threadExecutors.add(threadExecutorsInstance);
     }
-
-
 }
 
 class ThreadExecutors extends Thread {

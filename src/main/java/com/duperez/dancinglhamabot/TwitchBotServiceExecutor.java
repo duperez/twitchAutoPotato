@@ -29,8 +29,6 @@ public class TwitchBotServiceExecutor {
     private String user;
 
 
-
-
     @PostConstruct
     public void startBot() {
         System.out.println("Starting bot for user: " + user);
