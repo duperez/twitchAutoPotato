@@ -46,37 +46,21 @@ public class TwitchBotServiceExecutor {
 
         twitchClient.getEventManager().onEvent(ChannelMessageActionEvent.class, event -> {
             System.out.println(event.getMessage());
-            if (
-                            event.getMessage().contains(user) &&
-                            event.getMessage().contains("you have")
-
-            ) {
-                sendPotatoMessage(timer, twitchClient, event);
-                //if(isResult(event.getMessage())) {
-                //    extractTotalPotato(event.getMessage());
-                //    extractTotalNeededPotato(event.getMessage());
-                //    printNumberOfPotatoes();
-                //}
-
+            if (event.getMessage().contains(user) && event.getMessage().contains("you have")) {
+                //sendPotatoMessage(timer, event);
             }
         });
     }
 
-    private void sendPotatoMessage(Timer timer, TwitchClient twitchClient, ChannelMessageActionEvent event) {
-        if (event.getMessage().contains("potato")) {
-            timer.schedule(task(twitchClient, event, "potato"), 5000);
-        }
-        if (event.getMessage().contains("steal")) {
-            timer.schedule(task(twitchClient, event, "steal"), 10000);
-        }
-        if (event.getMessage().contains("trample")) {
-            timer.schedule(task(twitchClient, event, "trample"), 15000);
-        }
-        if (event.getMessage().contains("cdr")) {
-            timer.schedule(task(twitchClient, event, "cdr"), 5000);
-            timer.schedule(task(twitchClient, event, "potato"), 1000);
-            timer.schedule(task(twitchClient, event, "trample"), 15000);
-            timer.schedule(task(twitchClient, event, "steal"), 20000);
+    private void sendPotatoMessage(Timer timer, ChannelMessageActionEvent event) {
+        potatoTask(timer, 1000, event, "potato", false);
+        potatoTask(timer, 3000, event, "steal", false);
+        potatoTask(timer, 5000, event, "trample", false);
+        boolean isCdr = potatoTask(timer, 1000, event, "cdr", false);
+        if (isCdr) {
+            potatoTask(timer, 3000, event, "potato", true);
+            potatoTask(timer, 5000, event, "trample", true);
+            potatoTask(timer, 7000, event, "steal", true);
         }
     }
 
@@ -87,11 +71,7 @@ public class TwitchBotServiceExecutor {
 
         Matcher matcher = pattern.matcher(texto);
 
-
-        if(matcher.find()) {
-            return matcher.matches();
-        }
-        return false;
+        return matcher.find() && matcher.matches();
     }
 
     //public static Integer extractTotalPotato(String text) {
@@ -126,17 +106,19 @@ public class TwitchBotServiceExecutor {
     //    System.out.println(totalPotato);
     //}
 
+    private boolean potatoTask(Timer timer, int time, ChannelMessageActionEvent event, String command, boolean skipValidattion) {
 
-    @NotNull
-    private TimerTask task(TwitchClient twitchClient, ChannelMessageActionEvent event, String command) {
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                twitchClient.getChat().sendMessage(event.getChannel().getName(), "#" + command);
-                System.out.println(command + " executed!");
-            }
-        };
-        return task;
+        if (event.getMessage().contains(command) || skipValidattion) {
+            timer.schedule(
+                    new TimerTask() {
+                        @Override
+                        public void run() {
+                            event.getTwitchChat().sendMessage(event.getChannel().getName(), "#" + command);
+                        }
+                    }, time
+            );
+        }
+
+        return event.getMessage().contains(command) || skipValidattion;
     }
-
 }

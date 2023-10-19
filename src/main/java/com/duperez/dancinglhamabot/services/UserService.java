@@ -6,6 +6,8 @@ import com.duperez.dancinglhamabot.threadExecutors.ExecutionSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserService {
 
@@ -20,6 +22,14 @@ public class UserService {
 
     public void deleteUser(Integer id) {
         userRepository.deleteById(id);
+    }
+
+    public List<TwitchUser> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public TwitchUser findUserByName(String name) {
+        return userRepository.findByName(name).get();
     }
 
 
