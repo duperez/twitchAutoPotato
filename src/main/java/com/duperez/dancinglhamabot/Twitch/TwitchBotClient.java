@@ -1,5 +1,6 @@
 package com.duperez.dancinglhamabot.Twitch;
 
+import com.duperez.dancinglhamabot.entities.TwitchUser;
 import com.duperez.dancinglhamabot.repositories.TwitchChannelRepository;
 import com.duperez.dancinglhamabot.services.UserService;
 import com.duperez.dancinglhamabot.threadExecutors.GambleThread;
@@ -9,6 +10,8 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.util.stream.Collectors;
 
 @Component
 public class TwitchBotClient {
@@ -57,6 +60,29 @@ public class TwitchBotClient {
                 int max = Integer.parseInt(event.getMessage().split(" ")[4]);
 
                 new GambleThread().run(min, max, userService.findUserByName("@" + event.getUser().getName()));
+            }
+            if(event.getMessage().contains("removeUser")) {
+                if (event.getUser().getName().equalsIgnoreCase("duperez_dev")) {
+                    String user = event.getMessage().split(" ")[2];
+                    userService.deleteUser(userService.findUserByName("@" + user).getId());
+                    event.getTwitchChat().sendMessage(event.getChannel().getName(), "User " + user + " removed");
+                } else {
+                    event.getTwitchChat().sendMessage(event.getChannel().getName(), "You don't have permission to do that PoroSad");
+                }
+            }
+            if(event.getMessage().contains("showUsers")) {
+                if (event.getUser().getName().equalsIgnoreCase("duperez_dev")) {
+                    //get all usuers and transform in a list with all names
+                    String users = userService.getAllUsers()
+                            .stream()
+                            .map(TwitchUser::getUser_name)
+                            .collect(Collectors.joining(" | "));
+                    userService.getAllUsers().stream().map(twitchUser -> twitchUser.getUser_name() + " | ").forEach(users::concat);
+                    event.getTwitchChat().sendMessage(event.getChannel().getName(), "Current users: " + users);
+
+                } else {
+                    event.getTwitchChat().sendMessage(event.getChannel().getName(), "You don't have permission to do that PoroSad");
+                }
             }
         }
     }
