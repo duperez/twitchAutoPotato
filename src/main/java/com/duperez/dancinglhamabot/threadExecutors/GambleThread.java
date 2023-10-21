@@ -31,6 +31,22 @@ public class GambleThread extends Thread {
         twitchClient.getChat().sendMessage(twitchUser.getChannels(), "#gamba " + multiplier + " even");
         twitchClient.getEventManager().onEvent(ChannelMessageActionEvent.class, event -> {
             if (event.getMessage().toLowerCase().contains(twitchUser.getUser_name().toLowerCase())) {
+
+                if (event.getMessage().contains("✅") || event.getMessage().contains("❌")) {
+                    int potatoes = extractTotalPotato(event.getMessage());
+                    System.out.println(potatoes);
+                    if (potatoes <= min || potatoes >= max || multiplier > 1000) {
+                        twitchClient.getChat().sendMessage(twitchUser.getChannels(), "Gamble finished!");
+                        try {
+                            Thread.sleep(5000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                        twitchClient.close();
+                    }
+                }
+
+
                 if (event.getMessage().contains("✅")) {
                     try {
                         Thread.sleep(5000);
@@ -50,20 +66,6 @@ public class GambleThread extends Thread {
 
                     multiplier *= 2;
                     twitchClient.getChat().sendMessage(twitchUser.getChannels(), "#gamba " + multiplier + " even");
-                }
-
-                if (event.getMessage().contains("✅") || event.getMessage().contains("❌")) {
-                    int potatoes = extractTotalPotato(event.getMessage());
-                    System.out.println(potatoes);
-                    if (potatoes <= min || potatoes >= max || multiplier > 1000) {
-                        twitchClient.getChat().sendMessage(twitchUser.getChannels(), "Gamble finished!");
-                        try {
-                            Thread.sleep(5000);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                        twitchClient.close();
-                    }
                 }
             }
         });
