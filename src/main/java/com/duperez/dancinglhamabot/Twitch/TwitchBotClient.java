@@ -51,17 +51,14 @@ public class TwitchBotClient {
     }
 
     public void userCommand(ChannelMessageEvent event) {
-        if (event.getMessage().startsWith("-dupebot")) {
-            if (event.getMessage().contains("potato info")) {
+
+        String message = event.getMessage();
+        //it is a bot command
+        if (message.startsWith("-")) {
+            if (message.contains("info")) {
                 event.getTwitchChat().sendMessage(event.getChannel().getName(), "dupe bot status: ON | number of channels: " + twitchChannelRepository.findAll().size() + " | number of users: " + userService.getAllUsers().size());
             }
-            if (event.getMessage().contains("potato gamble")) {
-                int min = Integer.parseInt(event.getMessage().split(" ")[3]);
-                int max = Integer.parseInt(event.getMessage().split(" ")[4]);
-
-                new GambleThread().run(min, max, userService.findUserByName("@" + event.getUser().getName()));
-            }
-            if(event.getMessage().contains("removeUser")) {
+            if(message.contains("removeUser")) {
                 if (event.getUser().getName().equalsIgnoreCase("duperez_dev")) {
                     String user = event.getMessage().split(" ")[2];
                     userService.deleteUser(userService.findUserByName("@" + user).getId());
@@ -70,12 +67,13 @@ public class TwitchBotClient {
                     event.getTwitchChat().sendMessage(event.getChannel().getName(), "You don't have permission to do that PoroSad");
                 }
             }
-            if(event.getMessage().contains("showUsers")) {
+            if(message.contains("showUsers")) {
                 if (event.getUser().getName().equalsIgnoreCase("duperez_dev")) {
                     //get all usuers and transform in a list with all names
                     String users = userService.getAllUsers()
                             .stream()
                             .map(TwitchUser::getUser_name)
+                            .map(user -> user.replace("@", ""))
                             .collect(Collectors.joining(" | "));
                     userService.getAllUsers().stream().map(twitchUser -> twitchUser.getUser_name() + " | ").forEach(users::concat);
                     event.getTwitchChat().sendMessage(event.getChannel().getName(), "Current users: " + users);
@@ -83,6 +81,16 @@ public class TwitchBotClient {
                 } else {
                     event.getTwitchChat().sendMessage(event.getChannel().getName(), "You don't have permission to do that PoroSad");
                 }
+            }
+            // it is related to the potato automation
+            if (message.startsWith("-gamble")) {
+                int min = Integer.parseInt(event.getMessage().split(" ")[1]);
+                int max = Integer.parseInt(event.getMessage().split(" ")[2]);
+
+                new GambleThread().run(min, max, userService.findUserByName("@" + event.getUser().getName()));
+            }
+            if (message.equals("-potatoes")) {
+                event.getTwitchChat().sendMessage(event.getChannel().getName(), "You have " + userService.findUserByName("@" + event.getUser().getName()).getPotatoes() + " potatoes");
             }
         }
     }

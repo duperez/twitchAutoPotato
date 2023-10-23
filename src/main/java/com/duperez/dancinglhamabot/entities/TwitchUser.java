@@ -27,4 +27,6 @@ public class TwitchUser {
 
     private String user_name;
 
+    private Integer potatoes = 0;
+
 }

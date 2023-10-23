@@ -17,7 +17,7 @@ public class TwitchBotService {
 
         ExecutionSingleton executionSingleton = ExecutionSingleton.getInstance();
 
-        executionSingleton.execute(twitchUserRepository.findAll());
+        executionSingleton.execute(twitchUserRepository.findAll(), twitchUserRepository);
 
     }
 

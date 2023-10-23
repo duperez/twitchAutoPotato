@@ -1,5 +1,9 @@
 package com.duperez.dancinglhamabot.threadExecutors;
 
+import com.duperez.dancinglhamabot.entities.TwitchUser;
+import com.duperez.dancinglhamabot.repositories.UserRepository;
+import com.duperez.dancinglhamabot.services.UserService;
+import com.duperez.dancinglhamabot.utils.TwitchUtils;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
@@ -18,37 +22,37 @@ import java.util.regex.Pattern;
 @AllArgsConstructor
 public class TwitchBotServiceExecutor {
 
-    private String channels;
+    TwitchUser twitchUser;
 
-    private String clientId;
-
-    private String clientSecret;
-
-    private String oauth;
-
-    private String user;
+    private UserRepository userRepository;
 
 
     @PostConstruct
     public void startBot() {
-        System.out.println("Starting bot for user: " + user);
+        System.out.println("Starting bot for user: " + twitchUser.getUser_name());
 
         Timer timer = new Timer();
 
         TwitchClient twitchClient = TwitchClientBuilder.builder()
-                .withClientId(clientId)
-                .withClientSecret(clientSecret)
-                .withChatAccount(new OAuth2Credential("twitch", oauth))
+                .withClientId(twitchUser.getClientId())
+                .withClientSecret(twitchUser.getClientSecret())
+                .withChatAccount(new OAuth2Credential("twitch", twitchUser.getOauth()))
                 .withEnableChat(true)
                 .build();
 
-        twitchClient.getChat().joinChannel(channels);
+        twitchClient.getChat().joinChannel(twitchUser.getChannels());
 
         twitchClient.getEventManager().onEvent(ChannelMessageActionEvent.class, event -> {
             System.out.println(event.getMessage());
-            if (event.getMessage().contains(user) && event.getMessage().contains("you have")) {
+            if (event.getMessage().contains(twitchUser.getUser_name()) && event.getMessage().contains("you have")) {
                 sendPotatoMessage(timer, event);
             }
+            if (event.getMessage().contains(twitchUser.getUser_name()) && event.getMessage().contains("\uD83E\uDD54")) {
+                int potatoes = TwitchUtils.extractTotalPotato(event.getMessage().replace(",", ""));
+                twitchUser.setPotatoes(potatoes);
+                userRepository.save(twitchUser);
+            }
+
         });
     }
 
@@ -63,48 +67,6 @@ public class TwitchBotServiceExecutor {
             potatoTask(timer, 7000, event, "steal", true);
         }
     }
-
-    public boolean isResult(String texto) {
-        String padrao = "\\[(?:\\+|-)?\\d+ ⇒ (?:-\\d+|\\d+)\\]";
-
-        Pattern pattern = Pattern.compile(padrao);
-
-        Matcher matcher = pattern.matcher(texto);
-
-        return matcher.find() && matcher.matches();
-    }
-
-    //public static Integer extractTotalPotato(String text) {
-    //    String padrao = "\\[(?:\\+|-)?\\d+ ⇒ ([-\\d,]+)\\]";
-//
-    //    Pattern pattern = Pattern.compile(padrao);
-//
-    //    Matcher matcher = pattern.matcher(text);
-//
-    //    if(matcher.find()) {
-    //        totalPotato = Integer.parseInt(matcher.group(1));
-    //        return Integer.parseInt(matcher.group(1));
-    //    }
-    //    return 0;
-    //}
-//
-    //public static Integer extractTotalNeededPotato(String text) {
-    //    String padrao = "\\[(?:\\+|-)?\\d+ ⇒ ([-\\d,]+)\\]";
-//
-    //    Pattern pattern = Pattern.compile(padrao);
-//
-    //    Matcher matcher = pattern.matcher(text);
-//
-    //    if(matcher.find()) {
-    //        totalPotato = Integer.parseInt(matcher.group(1));
-    //        return Integer.parseInt(matcher.group(1));
-    //    }
-    //    return 0;
-    //}
-//
-    //public static void printNumberOfPotatoes() {
-    //    System.out.println(totalPotato);
-    //}
 
     private boolean potatoTask(Timer timer, int time, ChannelMessageActionEvent event, String command, boolean skipValidattion) {
 

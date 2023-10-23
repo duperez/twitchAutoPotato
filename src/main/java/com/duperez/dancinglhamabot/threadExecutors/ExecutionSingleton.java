@@ -1,6 +1,8 @@
 package com.duperez.dancinglhamabot.threadExecutors;
 
 import com.duperez.dancinglhamabot.entities.TwitchUser;
+import com.duperez.dancinglhamabot.repositories.UserRepository;
+import com.duperez.dancinglhamabot.services.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,17 +24,17 @@ public class ExecutionSingleton {
         return executionSingleton;
     }
 
-    public void execute(List<TwitchUser> twitchUsers) {
+    public void execute(List<TwitchUser> twitchUsers, UserRepository twitchUserRepository) {
         for(TwitchUser twitchUser : twitchUsers) {
-            execute(twitchUser);
+            execute(twitchUser, twitchUserRepository);
         }
     }
 
-    public void execute(TwitchUser twitchUser) {
+    public void execute(TwitchUser twitchUser, UserRepository twitchUserRepository) {
         if (threadExecutors == null)
             threadExecutors = new ArrayList<>();
         ThreadExecutors threadExecutorsInstance = new ThreadExecutors();
-        threadExecutorsInstance.run(new TwitchBotServiceExecutor(twitchUser.getChannels(), twitchUser.getClientId(), twitchUser.getClientSecret(), twitchUser.getOauth(), twitchUser.getUser_name()));
+        threadExecutorsInstance.run(new TwitchBotServiceExecutor(twitchUser, twitchUserRepository));
         threadExecutors.add(threadExecutorsInstance);
     }
 }

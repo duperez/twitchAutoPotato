@@ -16,7 +16,7 @@ public class UserService {
 
     public TwitchUser createUser(TwitchUser twitchUser) {
         ExecutionSingleton executionSingleton = ExecutionSingleton.getInstance();
-        executionSingleton.execute(twitchUser);
+        executionSingleton.execute(twitchUser, userRepository);
         return userRepository.save(twitchUser);
     }
 
