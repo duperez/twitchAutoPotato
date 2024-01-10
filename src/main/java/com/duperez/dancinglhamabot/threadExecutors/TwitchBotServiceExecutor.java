@@ -8,6 +8,7 @@ import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.chat.events.channel.ChannelMessageActionEvent;
+import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +43,7 @@ public class TwitchBotServiceExecutor {
 
         twitchClient.getChat().joinChannel(twitchUser.getChannels());
 
-        twitchClient.getEventManager().onEvent(ChannelMessageActionEvent.class, event -> {
+        twitchClient.getEventManager().onEvent(ChannelMessageEvent.class, event -> {
             System.out.println(event.getMessage());
             if (event.getMessage().contains(twitchUser.getUser_name()) && event.getMessage().contains("you have")) {
                 sendPotatoMessage(timer, event);
@@ -56,7 +57,7 @@ public class TwitchBotServiceExecutor {
         });
     }
 
-    private void sendPotatoMessage(Timer timer, ChannelMessageActionEvent event) {
+    private void sendPotatoMessage(Timer timer, ChannelMessageEvent event) {
         potatoTask(timer, 1000, event, "potato", false);
         potatoTask(timer, 3000, event, "steal", false);
         potatoTask(timer, 5000, event, "trample", false);
@@ -68,7 +69,7 @@ public class TwitchBotServiceExecutor {
         }
     }
 
-    private boolean potatoTask(Timer timer, int time, ChannelMessageActionEvent event, String command, boolean skipValidattion) {
+    private boolean potatoTask(Timer timer, int time, ChannelMessageEvent event, String command, boolean skipValidattion) {
 
         if (event.getMessage().contains(command) || skipValidattion) {
             timer.schedule(
